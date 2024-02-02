@@ -102,7 +102,7 @@ public class IAEnemy : MonoBehaviour
                 Debug.Log("Buscando punto aleatorio");
 
                 Vector3 randomSearchPoint = lastTargetPosition + Random.insideUnitSphere *  searchRadius;
-                randomSearchPoint.y = 0f;
+                randomSearchPoint.y = lastTargetPosition.y;
                 enemyAgent.destination = randomSearchPoint;
             }
         }
