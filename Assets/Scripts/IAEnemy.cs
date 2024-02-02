@@ -27,7 +27,7 @@ public class IAEnemy : MonoBehaviour
 
     Vector3 lastTargetPosition;
 
-    float searchTimer;
+    [SerializeField]float searchTimer;
     [SerializeField]float searchWaitTime = 15;
     [SerializeField]float searchRadius = 30;
 
@@ -70,7 +70,7 @@ public class IAEnemy : MonoBehaviour
         }
 
         if(enemyAgent.remainingDistance<0.5f)
-        {
+        {   
             SetRandomPoint();
         }
     }
@@ -81,17 +81,35 @@ public class IAEnemy : MonoBehaviour
 
         if(OnRange() == false)
         {
-            currentState = State.Patrolling;
+            searchTimer = 0;
+            currentState = State.Searching;
         }
     }
 
     void Search()
     {
+        if(OnRange() == true)
+        {
+            currentState = State.Chasing;
+        }
+
         searchTimer += Time.deltaTime;
 
         if(searchTimer < searchWaitTime)
         {
+            if(enemyAgent.remainingDistance < 0.5f)
+            {
+                Debug.Log("Buscando punto aleatorio");
 
+                Vector3 randomSearchPoint = lastTargetPosition + Random.insideUnitSphere *  searchRadius;
+                randomSearchPoint.y = 0f;
+                enemyAgent.destination = randomSearchPoint;
+            }
+        }
+       
+        else
+        {
+            currentState = State.Patrolling;
         }
     }
 
