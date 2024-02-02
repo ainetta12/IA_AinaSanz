@@ -10,7 +10,9 @@ public class IAEnemy : MonoBehaviour
     {
         Patrolling,
         Chasing,
-        Searching
+        Searching,
+        Waiting,
+        Attacking
     }
 
     State currentState;
@@ -58,6 +60,14 @@ public class IAEnemy : MonoBehaviour
             break;
              case State.Searching:
                 Search();
+
+            break;
+             case State.Waiting:
+                Wait();
+
+            break;
+             case State.Attacking:
+                Attack();
             break;
         }
     }
@@ -111,6 +121,17 @@ public class IAEnemy : MonoBehaviour
         {
             currentState = State.Patrolling;
         }
+    }
+
+    void Waiting()
+    {
+
+    }
+
+    void Attacking()
+    {
+       enemyAgent.destination = playerTransform.position;
+        Debug.Log("Attack");
     }
 
      void SetRandomPoint()
