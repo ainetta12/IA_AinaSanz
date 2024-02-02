@@ -125,7 +125,7 @@ public class IAEnemy : MonoBehaviour
 
     void Waiting()
     {
-
+        
     }
 
     void Attacking()
