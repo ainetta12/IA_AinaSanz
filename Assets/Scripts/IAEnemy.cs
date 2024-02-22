@@ -33,6 +33,13 @@ public class IAEnemy : MonoBehaviour
     [SerializeField]float searchWaitTime = 15;
     [SerializeField]float searchRadius = 30;
 
+    public Transform[] points;
+    [SerializeField] int pointDestination = 0; 
+
+    [SerializeField] float rangeAttack = 5;
+
+    private bool repeat = true;
+
     void Awake()
     {
         enemyAgent = GetComponent<NavMeshAgent>();
@@ -44,6 +51,8 @@ public class IAEnemy : MonoBehaviour
     void Start()
     {
         currentState = State.Patrolling;
+        enemyAgent.destination = points[pointDestination].position;
+        enemyAgent.autoBraking = false;
     }
 
     // Update is called once per frame
@@ -81,7 +90,8 @@ public class IAEnemy : MonoBehaviour
 
         if(enemyAgent.remainingDistance<0.5f)
         {   
-            SetRandomPoint();
+            currentState = State.Waiting;
+            //SetRandomPoint();
         }
     }
 
@@ -94,6 +104,14 @@ public class IAEnemy : MonoBehaviour
             searchTimer = 0;
             currentState = State.Searching;
         }
+         
+         if(OnRangeAttack() == true)
+        {
+            currentState = State.Attacking;
+            
+        }
+
+
     }
 
     void Search()
@@ -123,24 +141,86 @@ public class IAEnemy : MonoBehaviour
         }
     }
 
-    void Waiting()
+    void GoNextPoint()
     {
-        
+        if(points.Length == 0)
+        {
+            return;
+        }
+
+        pointDestination = (pointDestination + 1) % points.Length;
+        enemyAgent.destination = points[pointDestination].position;
     }
 
-    void Attacking()
+    void Wait()
     {
-       enemyAgent.destination = playerTransform.position;
+        if (repeat == true)
+        {
+            StartCoroutine ("Waiting");
+        }
+    }
+
+    IEnumerator Waiting()
+    {
+        repeat = false;
+        yield return new WaitForSeconds (5);
+        GoNextPoint();
+        currentState = State.Patrolling;
+        repeat = true;
+    }
+
+    void Attack()
+    {
+       //enemyAgent.destination = playerTransform.position;
         Debug.Log("Attack");
+        currentState = State.Chasing;
     }
 
-     void SetRandomPoint()
+    /* void SetRandomPoint()
     {
         float randomX = Random.Range(-patrolAreaSize.x / 2, patrolAreaSize.x / 2);
         float randomZ = Random.Range(-patrolAreaSize.x / 2, patrolAreaSize.x / 2);
         Vector3 randomPoint = new Vector3(randomX, 0f, randomZ) + patrolAreaCenter.position;
 
         enemyAgent.destination = randomPoint;
+    }*/
+
+     bool OnRangeAttack()
+    {
+        /*if(Vector3.Distance(transform.position, playerTransform.position)<= visionRange)
+        {
+            return true;
+        }
+
+        return false;*/
+
+        Vector3 directionToPlayer = playerTransform.position - transform.position;
+        float distanceToPlayer = directionToPlayer.magnitude;
+        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+
+        if(distanceToPlayer <= visionRange && angleToPlayer< visionAngle* 0.3f)
+        {
+            //return true;
+
+            if(playerTransform.position == lastTargetPosition)
+            {
+                return true;
+            }
+
+            RaycastHit hit;
+            if(Physics.Raycast(transform.position, directionToPlayer, out hit, distanceToPlayer))
+            {
+                if(hit.collider.CompareTag("Player"))
+                {
+                    lastTargetPosition = playerTransform.position;
+
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return false;
     }
 
     bool OnRange()
