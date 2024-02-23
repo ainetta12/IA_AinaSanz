@@ -6,6 +6,7 @@ using UnityEngine.AI; //****
 public class Repaso : MonoBehaviour
 {
 
+//Instalar window AI Navigation
     enum State
     {
         Patrolling,
@@ -28,7 +29,7 @@ public class Repaso : MonoBehaviour
 
     void Start()
     {
-        agent.destination = patrolPoints[Random.Range(0,patrolPoints.Lenght - 1)].position;
+        SetRandomPoint();
         currentState = State.Patrolling;
 
     }
@@ -52,26 +53,26 @@ public class Repaso : MonoBehaviour
 
     void Patrol()
     {
-        if(Vector3.Distance(transform.position, player.position) < detectionRange)
+        if(IsInRange(detectionRange) == true)
         {
             currentState = State.Chasing;
         }
 
         if(agent.remainingDistance < 0.5f)
         {
-            agent.destination = patrolPoints[Random.Range(0,patrolPoints.Lenght - 1)].position;
+            SetRandomPoint();
         }
     }
 
     void Chase()
     {
-         if(Vector3.Distance(transform.position, player.position) > detectionRange)
+         if(IsInRange(detectionRange) == false)
         {
-            agent.destination = patrolPoints[Random.Range(0,patrolPoints.Lenght - 1)].position;
+            SetRandomPoint();
             currentState = State.Chasing;
         }
 
-        if(Vector3.Distance(transform.position, player.position) < attackRange)
+        if(IsInRange(attackRange) == true)
         {
             currentState = State.Attacking;
         }
@@ -87,6 +88,18 @@ public class Repaso : MonoBehaviour
     void SetRandomPoint()
     {
         agent.destination = patrolPoints[Random.Range(0,patrolPoints.Lenght - 1)].position;
+    }
+
+    bool IsInRange(float range)
+    {
+        if(Vector3.Distance(transform.position, player.position) < attackRange)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     void OnDrawGizmos()
