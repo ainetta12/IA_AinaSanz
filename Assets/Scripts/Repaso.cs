@@ -11,7 +11,7 @@ public class Repaso : MonoBehaviour
     {
         Patrolling,
         Chasing,
-        Attaking
+        Attacking
     }
 
     private State currentState;
@@ -38,13 +38,15 @@ public class Repaso : MonoBehaviour
     {
         switch (currentState)
         {
-            case State.Patrolling;
+            case State.Patrolling:
                 Patrol();
             break;
-            case State.Chasing;
+
+            case State.Chasing:
                 Chase();
             break;
-            case State.Attacking;
+
+            case State.Attacking:
                 Attack();
             break;
 
@@ -87,7 +89,7 @@ public class Repaso : MonoBehaviour
     }
     void SetRandomPoint()
     {
-        agent.destination = patrolPoints[Random.Range(0,patrolPoints.Lenght - 1)].position;
+        agent.destination = patrolPoints[Random.Range(0,patrolPoints.Length - 1)].position;
     }
 
     bool IsInRange(float range)
@@ -108,7 +110,7 @@ public class Repaso : MonoBehaviour
 
         foreach(Transform point in patrolPoints)
         {
-            Gizmos.DrawWirephere(point.position, 0.5f);
+            Gizmos.DrawWireSphere(point.position, 0.5f);
         }
 
         Gizmos.color = Color.green;
